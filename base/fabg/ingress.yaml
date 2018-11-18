@@ -1,0 +1,15 @@
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: fabg
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: fabg-lb
+    # kubernetes.io/ingress.allow-http: "false"
+spec:
+  tls:
+  - secretName: fabg-tls
+  backend:
+    serviceName: fabg
+    servicePort: 80

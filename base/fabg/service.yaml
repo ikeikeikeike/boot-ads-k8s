@@ -1,0 +1,20 @@
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: fabg
+spec:
+  type: NodePort  # type: LoadBalancer
+  selector:
+    base: fabg
+  ports:
+  - name: sping
+    port: 8080
+    targetPort: 8080
+  - name: django
+    port: 8000
+    targetPort: 8000
+  - name: http
+    port: 80
+    targetPort: 80

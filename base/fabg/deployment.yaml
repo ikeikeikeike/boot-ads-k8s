@@ -1,0 +1,73 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fabg
+spec:
+  replicas: 2
+  template:
+    metadata:
+      name: fabg
+      labels:
+        base: fabg
+    spec:
+      containers:
+      - name: fabg
+        image: asia.gcr.io/nonononono/fabg:latest
+        imagePullPolicy: Always
+        command: ["sh", "-c", "tail -f /dev/null"]
+        # command: ["/bin/sh", "-c", "cp -pR ./public /apps/fabg-shared/ && bundle exec unicorn_rails -c config/unicorn.rb -E production"]
+        env:
+        - name: GOOGLE_CREDENTIALS
+          value: /secrets/cloudsql/credentials.json
+        - name: GOOGLE_PROJECT
+          valueFrom:
+            secretKeyRef:
+              name: gcread
+              key: project
+        - name: DB_HOST
+          value: 127.0.0.1
+        - name: DB_USER
+          value: fabg
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: fabgdb
+              key: password
+        volumeMounts:
+        - name: fabg-shared
+          mountPath: /apps/fabg-shared
+        - name: cloudsql-instance-credentials
+          mountPath: /secrets/cloudsql
+
+      - name: simply-nginx
+        image: nginx:alpine
+        ports:
+        - name: simply-nginx
+          containerPort: 80
+        volumeMounts:
+        - name: simply-nginx-conf
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        - name: fabg-shared
+          mountPath: /apps/fabg-shared
+
+      - name: cloudsql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.13
+        command: ["/cloud_sql_proxy",
+                  "-instances=boot-ads:asia-northeast1:fabgmaster-instance=tcp:3306",
+                  "-credential_file=/secrets/cloudsql/credentials.json"]
+        volumeMounts:
+        - name: cloudsql-instance-credentials
+          mountPath: /secrets/cloudsql
+
+      volumes:
+      - name: cloudsql-instance-credentials
+        secret:
+          secretName: gcread
+      - name: simply-nginx-conf
+        configMap:
+          name: simply-nginx-conf
+      - name: fabg-shared
+        emptyDir: {}
