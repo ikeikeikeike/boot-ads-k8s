@@ -16,9 +16,11 @@ spec:
       - name: fabg
         image: asia.gcr.io/nonononono/fabg:latest
         imagePullPolicy: Always
-        command: ["sh", "-c", "tail -f /dev/null"]
-        # command: ["/bin/sh", "-c", "cp -pR ./public /apps/fabg-shared/ && bundle exec unicorn_rails -c config/unicorn.rb -E production"]
+        # command: ["sh", "-c", "tail -f /dev/null"]
+        command: ["/bin/sh", "-c", "java -jar /apps/boot-ads/ads/ads.jar"]
         env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: production
         - name: GOOGLE_CREDENTIALS
           value: /secrets/cloudsql/credentials.json
         - name: GOOGLE_PROJECT
