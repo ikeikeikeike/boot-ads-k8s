@@ -7,21 +7,21 @@ metadata:
 data:
   fabg.conf: |-
 
-    # upstream admin_backend {
-        # server production-fabg:8000;
-        # keepalive 64;
-    # }
+    upstream admin_backend {
+        server production-fabg:8000;
+        keepalive 64;
+    }
 
-    # upstream public_backend {
-        # server production-fabg:8080;
-        # keepalive 64;
-    # }
+    upstream public_backend {
+        server production-fabg:8080;
+        keepalive 64;
+    }
 
     server {
         listen 80; listen [::]:80;
 
         server_name localhost;
-        root /apps/fabg-shared/public;
+        root /apps/fabg-shared;
 
         access_log /dev/stdout main;
         error_log /dev/stderr error;
@@ -33,16 +33,15 @@ data:
             return 301 https://$host$request_uri;
         }
 
-        # location / {
-            # if (-f $request_filename) { break; }
-            # proxy_pass http://public_backend;
-        # }
-
-        location ~ ^/assets/ {
-            access_log off;
+        location / {
+            proxy_pass http://public_backend;
         }
 
-        location ~ ^/spree/ {
+        location /admin {
+            proxy_pass http://admin_backend;
+        }
+
+        location ~ ^/assets/ {
             access_log off;
         }
     }
