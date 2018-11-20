@@ -16,11 +16,44 @@ spec:
       - name: fabg
         image: asia.gcr.io/nonononono/fabg:latest
         imagePullPolicy: Always
-        # command: ["sh", "-c", "tail -f /dev/null"]
-        command: ["/bin/sh", "-c", "java -jar /apps/boot-ads/ads/ads.jar"]
+        command: ["sh", "-c", "tail -f /dev/null"]
+        # command: ["/bin/sh", "-c", "java -jar /apps/boot-ads/ads/ads.jar"]
         env:
         - name: SPRING_PROFILES_ACTIVE
           value: production
+        - name: GOOGLE_CREDENTIALS
+          value: /secrets/cloudsql/credentials.json
+        - name: GOOGLE_PROJECT
+          valueFrom:
+            secretKeyRef:
+              name: gcread
+              key: project
+        - name: DB_HOST
+          value: 127.0.0.1
+        - name: DB_USER
+          value: fabg
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: fabgdb
+              key: password
+        volumeMounts:
+        - name: fabg-shared
+          mountPath: /apps/fabg-shared
+        - name: cloudsql-instance-credentials
+          mountPath: /secrets/cloudsql
+
+      - name: fabg-admin
+        image: asia.gcr.io/nonononono/fabg-admin:latest
+        imagePullPolicy: Always
+        command: ["sh", "-c", "tail -f /dev/null"]
+        # command: [
+            # "/bin/sh", "-c", "cd /apps/boot-ads/admin/ads &&",
+            # "/apps/boot-ads/admin/.venv/bin/gunicorn",
+            # "--env DJANGO_SETTINGS_MODULE=ads.settings.production ads.wsgi",
+            # "--workers 1",
+        # ]
+        env:
         - name: GOOGLE_CREDENTIALS
           value: /secrets/cloudsql/credentials.json
         - name: GOOGLE_PROJECT

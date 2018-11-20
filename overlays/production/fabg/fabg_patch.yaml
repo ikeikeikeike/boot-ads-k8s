@@ -10,3 +10,5 @@ spec:
       containers:
       - name: fabg
         image: asia.gcr.io/boot-ads/fabg:latest
+      - name: fabg-admin
+        image: asia.gcr.io/boot-ads/fabg-admin:latest
