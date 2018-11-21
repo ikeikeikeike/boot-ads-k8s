@@ -8,12 +8,12 @@ data:
   fabg.conf: |-
 
     upstream admin_backend {
-        server production-fabg:8000;
+        server 127.0.0.1:8000; # server production-fabg:8000;
         keepalive 64;
     }
 
     upstream public_backend {
-        server production-fabg:8080;
+        server 127.0.0.1:8080; # server production-fabg:8080;
         keepalive 64;
     }
 
@@ -33,12 +33,12 @@ data:
             return 301 https://$host$request_uri;
         }
 
-        location / {
-            proxy_pass http://public_backend;
-        }
-
         location /admin {
             proxy_pass http://admin_backend;
+        }
+
+        location / {
+            proxy_pass http://public_backend;
         }
 
         location ~ ^/assets/ {

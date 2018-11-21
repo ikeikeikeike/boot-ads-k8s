@@ -48,7 +48,7 @@ spec:
         imagePullPolicy: Always
         # command: ["sh", "-c", "tail -f /dev/null"]
         command: ["/bin/sh", "-c", "cd /apps/boot-ads/admin/ads
-            && cp -pR ../assets /apps/lit-shared/
+            && cp -pR ../assets /apps/fabg-shared/
             && /apps/boot-ads/admin/.venv/bin/gunicorn
                 --env DJANGO_SETTINGS_MODULE=ads.settings.production ads.wsgi
                 --workers 1"
