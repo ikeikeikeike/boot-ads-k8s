@@ -17,6 +17,9 @@ data:
         keepalive 64;
     }
 
+    proxy_cache_path /var/cache/nginx/cache levels=1:2 keys_zone=fabgkey:8m max_size=500m inactive=10m;
+    proxy_temp_path /var/cache/nginx/tmp;
+
     server {
         listen 80; listen [::]:80;
 
@@ -38,6 +41,13 @@ data:
         }
 
         location / {
+            proxy_ignore_headers     Cache-Control;
+            proxy_cache              fabgkey;
+            proxy_cache_valid        200 302 5m;
+            proxy_cache_valid        404 10m;
+
+            # add_header X-Nginx-Cache $upstream_cache_status;
+
             proxy_pass http://public_backend;
         }
 
