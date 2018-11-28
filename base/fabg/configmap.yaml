@@ -40,6 +40,21 @@ data:
             proxy_pass http://admin_backend;
         }
 
+        location /__articles__ {
+            proxy_pass http://public_backend;
+        }
+
+        location / {
+            proxy_ignore_headers     Cache-Control;
+            proxy_cache              fabgkey;
+            proxy_cache_valid        200 302 5m;
+            proxy_cache_valid        404 10m;
+
+            # add_header X-Nginx-Cache $upstream_cache_status;
+
+            proxy_pass http://public_backend;
+        }
+
         location / {
             proxy_ignore_headers     Cache-Control;
             proxy_cache              fabgkey;
