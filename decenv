@@ -1,0 +1,13 @@
+#!/bin/bash
+
+vault=`which ansible-vault`
+secret=secret/vault-password.txt
+
+if [ ! -f $secret ]; then
+    read -sp "Password: " PASS
+    mkdir -p secret && echo $PASS > $secret
+fi
+
+echo `$vault view .gcpkey.json.vault --vault-password-file=$secret | cat -` > /tmp/boot-ads-gcpkey.json
+
+$vault view .env.vault --vault-password-file=$secret | cat -
